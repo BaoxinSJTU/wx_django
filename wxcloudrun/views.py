@@ -1,6 +1,7 @@
 import json
 import logging
 
+from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.shortcuts import render
 from wxcloudrun.models import Counters
@@ -8,9 +9,10 @@ from wxcloudrun.models import State
 
 logger = logging.getLogger('log')
 
-def remainer(request, _):
+@require_http_methods(["GET", "POST"])
+def remainer(request):
     rsp = JsonResponse({'code': 0, 'errorMsg': ''}, json_dumps_params={'ensure_ascii': False})
-    if request.method == 'GET' or request.method == 'get':
+    if request.method.lower() == 'get':
         try:
             data = State.objects.get(id=1)
         except State.DoesNotExist:
@@ -19,9 +21,14 @@ def remainer(request, _):
         data.state = False
         data.save()
         rsp = JsonResponse({'code' : 0, "data": True}, json_dumps_params={'ensure_ascii': False})
-    elif request.method == 'POST' or request.method == 'post':
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+    elif request.method.lower() == 'post':
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+        except json.JSONDecodeError:
+            rsp = JsonResponse({'code': -1, 'errorMsg': '无效的 JSON'}, json_dumps_params={'ensure_ascii': False})
+            return rsp
+
         if "enabled" in body:
             enabled = body["enabled"]
             try:
@@ -33,10 +40,10 @@ def remainer(request, _):
             data.save()
             rsp = JsonResponse({'code' : 0, "data": True}, json_dumps_params={'ensure_ascii': False})
         else:
-            rsp = JsonResponse({'code' : 0, "data": False, 'errorMsg': '请求字段需要包含enabled'}, json_dumps_params={'ensure_ascii': False})
+            rsp = JsonResponse({'code' : 0, "data": False, 'errorMsg': '请求字段需要包含 enabled'}, json_dumps_params={'ensure_ascii': False})
     else:
-        rsp = JsonResponse({'code': -1, 'errorMsg': '请求方式错误'},
-                            json_dumps_params={'ensure_ascii': False})
+        rsp = JsonResponse({'code': -1, 'errorMsg': '请求方式错误'}, json_dumps_params={'ensure_ascii': False})
+    
     logger.info('response result: {}'.format(rsp.content.decode('utf-8')))
     return rsp
 def index(request, _):
