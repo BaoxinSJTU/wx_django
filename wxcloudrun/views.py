@@ -8,20 +8,20 @@ from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger('log')
 
-def wechat_user_view(request):
-    if request.method == 'GET':
-        # 获取所有 WeChatUser 实例，并选择需要的字段
-        users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
-        users_list = list(users)
-        return JsonResponse({'users': users_list}, status=200)
+def wechat_user_view(request, _):
+    # if request.method == 'GET':
+    #     # 获取所有 WeChatUser 实例，并选择需要的字段
+    #     users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
+    #     users_list = list(users)
+    #     return JsonResponse({'users': users_list}, status=200)
     
-    elif request.method == 'POST':
-        # 清空 WeChatUser 表中的所有数据
-        WeChatUser.objects.all().delete()
-        return JsonResponse({'status': 'All WeChatUser entries have been deleted.'}, status=200)
+    # elif request.method == 'POST':
+    #     # 清空 WeChatUser 表中的所有数据
+    #     WeChatUser.objects.all().delete()
+    #     return JsonResponse({'status': 'All WeChatUser entries have been deleted.'}, status=200)
     
-    else:
-        return JsonResponse({'error': 'Unsupported HTTP method.'}, status=405)
+    # else:
+    return JsonResponse({'error': 'Unsupported HTTP method.'}, status=405)
 def index(request, _):
     """
     获取主页
