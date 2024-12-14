@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger('log')
 
-@csrf_exempt
 def wechat_user_view(request):
     if request.method == 'GET':
         # 获取所有 WeChatUser 实例，并选择需要的字段
