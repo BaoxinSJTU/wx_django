@@ -1,27 +1,59 @@
 import json
 import logging
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from wxcloudrun.models import Counters, WeChatUser
 from django.views.decorators.csrf import csrf_exempt
+import traceback
 
 logger = logging.getLogger('log')
 
-def wechat_user_view(request, _):
-    # if request.method == 'GET':
-    #     # 获取所有 WeChatUser 实例，并选择需要的字段
-    #     users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
-    #     users_list = list(users)
-    #     return JsonResponse({'users': users_list}, status=200)
+def wechat_user_view(request):
+    if request.method == 'GET':
+        try:
+            # 获取所有 WeChatUser 实例，并选择需要的字段
+            users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
+            users_list = list(users)
+            # 以 JSON 格式返回
+            return JsonResponse({'users': users_list}, status=200)
+        
+        except Exception as e:
+            # 捕获异常，记录错误日志（可选）
+            print(f"Error during GET request: {str(e)}")
+            traceback.print_exc()
+            # 返回错误信息作为网页响应
+            return HttpResponse(
+                f"<h1>500 Internal Server Error</h1><p>{str(e)}</p>",
+                status=500
+            )
     
-    # elif request.method == 'POST':
-    #     # 清空 WeChatUser 表中的所有数据
-    #     WeChatUser.objects.all().delete()
-    #     return JsonResponse({'status': 'All WeChatUser entries have been deleted.'}, status=200)
+    elif request.method == 'POST':
+        try:
+            # 清空 WeChatUser 表中的所有数据
+            WeChatUser.objects.all().delete()
+            # 返回成功信息
+            return HttpResponse(
+                "<h1>Success</h1><p>All WeChatUser entries have been deleted.</p>",
+                status=200
+            )
+        
+        except Exception as e:
+            # 捕获异常，记录错误日志（可选）
+            print(f"Error during POST request: {str(e)}")
+            traceback.print_exc()
+            # 返回错误信息作为网页响应
+            return HttpResponse(
+                f"<h1>500 Internal Server Error</h1><p>{str(e)}</p>",
+                status=500
+            )
     
-    # else:
-    return JsonResponse({'error': 'Unsupported HTTP method.'}, status=405)
+    else:
+        # 不支持的 HTTP 方法
+        return HttpResponse(
+            "<h1>405 Method Not Allowed</h1><p>Unsupported HTTP method.</p>",
+            status=405
+        )
 def index(request, _):
     """
     获取主页
