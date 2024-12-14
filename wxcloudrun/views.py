@@ -3,32 +3,26 @@ import logging
 
 from django.http import JsonResponse
 from django.shortcuts import render
-from wxcloudrun.models import Counters
+from wxcloudrun.models import Counters, WeChatUser
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger('log')
 
-def remainer(request):
-    rsp = JsonResponse({'code': 0, 'errorMsg': ''}, json_dumps_params={'ensure_ascii': False})
-    if request.method.lower() == 'get':
-        rsp = JsonResponse({'code' : 0, "data": True}, json_dumps_params={'ensure_ascii': False})
-    elif request.method.lower() == 'post':
-        try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
-        except json.JSONDecodeError:
-            rsp = JsonResponse({'code': -1, 'errorMsg': '无效的 JSON'}, json_dumps_params={'ensure_ascii': False})
-            return rsp
-
-        if "enabled" in body:
-            enabled = body["enabled"]
-            rsp = JsonResponse({'code' : 0, "data": True}, json_dumps_params={'ensure_ascii': False})
-        else:
-            rsp = JsonResponse({'code' : 0, "data": False, 'errorMsg': '请求字段需要包含 enabled'}, json_dumps_params={'ensure_ascii': False})
-    else:
-        rsp = JsonResponse({'code': -1, 'errorMsg': '请求方式错误'}, json_dumps_params={'ensure_ascii': False})
+@csrf_exempt
+def wechat_user_view(request):
+    if request.method == 'GET':
+        # 获取所有 WeChatUser 实例，并选择需要的字段
+        users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
+        users_list = list(users)
+        return JsonResponse({'users': users_list}, status=200)
     
-    logger.info('response result: {}'.format(rsp.content.decode('utf-8')))
-    return rsp
+    elif request.method == 'POST':
+        # 清空 WeChatUser 表中的所有数据
+        WeChatUser.objects.all().delete()
+        return JsonResponse({'status': 'All WeChatUser entries have been deleted.'}, status=200)
+    
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method.'}, status=405)
 def index(request, _):
     """
     获取主页

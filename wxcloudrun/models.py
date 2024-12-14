@@ -16,3 +16,16 @@ class Counters(models.Model):
 
     class Meta:
         db_table = 'Counters'  # 数据库表名
+
+class WeChatUser(models.Model):
+    openid = models.CharField(max_length=100, unique=True, verbose_name="微信用户 OpenID")
+    last_access_time = models.DateTimeField(auto_now=True, verbose_name="上一次访问时间")
+    is_subscribed = models.BooleanField(default=False, verbose_name="是否订阅")
+
+    def __str__(self):
+        return f"OpenID: {self.openid} - {'已订阅' if self.is_subscribed else '未订阅'}"
+
+    class Meta:
+        db_table = 'WeChatUser'
+        verbose_name = "微信用户"
+        verbose_name_plural = "微信用户列表"
