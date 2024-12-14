@@ -10,6 +10,7 @@ class Counters(models.Model):
     createdAt = models.DateTimeField(default=datetime.now(), )
     updatedAt = models.DateTimeField(default=datetime.now(),)
     subscribe = models.BooleanField(default=False, verbose_name="订阅")
+    test = models.BooleanField(default=True, verbose_name="测试用")
     def __str__(self):
         return f"计数: {self.count} - {'已订阅' if self.subscribe else '未订阅'}"
 
