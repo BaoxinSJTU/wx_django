@@ -9,7 +9,7 @@ class Counters(models.Model):
     count = models.IntegerField(max_length=11, default=0)
     createdAt = models.DateTimeField(default=datetime.now(), )
     updatedAt = models.DateTimeField(default=datetime.now(),)
-    Subscribe = models.BooleanField(default=False)
+    # subscribe = models.BooleanField(default=False)
     def __str__(self):
         return self.title
 
