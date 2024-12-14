@@ -9,9 +9,9 @@ class Counters(models.Model):
     count = models.IntegerField(max_length=11, default=0)
     createdAt = models.DateTimeField(default=datetime.now(), )
     updatedAt = models.DateTimeField(default=datetime.now(),)
-    # subscribe = models.BooleanField(default=False)
+    subscribe = models.BooleanField(default=False, verbose_name="订阅")
     def __str__(self):
-        return self.title
+        return f"计数: {self.count} - {'已订阅' if self.subscribe else '未订阅'}"
 
     class Meta:
         db_table = 'Counters'  # 数据库表名

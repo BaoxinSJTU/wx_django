@@ -2,9 +2,10 @@
   "containers": [
     {
       "name": "wx_django",
-      "containerId": "0605bfe855c704ea18e302d78754aa8ed7aa87ba0bbf0b2b8093196d3c5a36b0",
       "domain": "",
-      "ip": ""
+      "ip": "",
+      "mode": "compose",
+      "containerId": "0dbac9c3c8c8102a8f557641a352e21cb372a0f1c9f902925e48bbef8af70a1a"
     }
   ],
   "config": {
