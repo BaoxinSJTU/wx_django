@@ -16,22 +16,21 @@ Including another URLconf
 
 from wxcloudrun import views
 from django.conf.urls import url
-from django.urls import path
-urlpatterns = [
-    # 计数器接口
-    path('api/count/', views.counter, name='counter'),
-    # 喝水状态接口
-    path('api/remainer/', views.remainer, name='remainer'),
-
-    # 获取主页
-    path('', views.index, name='index'),
-]
-# urlpatterns = (
+# urlpatterns = [
 #     # 计数器接口
-#     url(r'^^api/count(/)?$', views.counter),
+#     path('api/count/', views.counter, name='counter'),
 #     # 喝水状态接口
-#     url(r'^^api/remainer(/)?$', views.remainer),
+#     path('api/remainer/', views.remainer, name='remainer'),
 
 #     # 获取主页
-#     url(r'(/)?$', views.index),
-# )
+#     path('', views.index, name='index'),
+# ]
+urlpatterns = (
+    # 计数器接口
+    url(r'^^api/count(/)?$', views.counter),
+    # 喝水状态接口
+    url(r'^^api/remainer(/)?$', views.remainer),
+
+    # 获取主页
+    url(r'(/)?$', views.index),
+)
