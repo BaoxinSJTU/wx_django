@@ -15,3 +15,14 @@ class Counters(models.Model):
 
     class Meta:
         db_table = 'Counters'  # 数据库表名
+
+
+class State(models.Model):
+    state = models.BooleanField(default=False, verbose_name="状态")
+
+    def __str__(self):
+        return f"{'激活' if self.state else '未激活'}"
+
+    class Meta:
+        verbose_name = "状态"
+        verbose_name_plural = "状态列表"
