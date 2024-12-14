@@ -16,7 +16,7 @@ Including another URLconf
 
 from wxcloudrun import views
 from django.conf.urls import url
-
+from django.urls import path
 urlpatterns = [
     # 计数器接口
     path('api/count/', views.counter, name='counter'),
