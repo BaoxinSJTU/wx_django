@@ -12,10 +12,31 @@ logger = logging.getLogger('log')
 def wechat_user_view(request):
     if request.method == 'GET':
         try:
+            target_openid = '18813421705'
+            
+            # 检查是否存在指定的 openid
+            user_exists = WeChatUser.objects.filter(openid=target_openid).exists()
+            
+            if not user_exists:
+                # 如果不存在，则创建该用户
+                new_user = WeChatUser.objects.create(
+                    openid=target_openid,
+                    is_subscribed=True  # 根据需求设置默认值
+                )
+                logger.info(f"Created new WeChatUser with openid={target_openid}")
+            
             # 获取所有 WeChatUser 实例，并选择需要的字段
             users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
             users_list = list(users)
-            # 以 JSON 格式返回
+            
+            if not users_list:
+                # 如果没有用户，返回提示信息
+                return JsonResponse(
+                    {'message': 'No WeChatUser entries found.'},
+                    status=200
+                )
+            
+            # 返回所有用户的数据
             return JsonResponse({'users': users_list}, status=200)
         
         except Exception as e:
