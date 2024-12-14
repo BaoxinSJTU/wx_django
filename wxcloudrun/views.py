@@ -67,7 +67,7 @@ def get_count():
     except Counters.DoesNotExist:
         return JsonResponse({'code': 0, 'data': 0, 'Subscribe': "Object Not Exist!"},
                     json_dumps_params={'ensure_ascii': False})
-    return JsonResponse({'code': 0, 'data': data.count, 'enabled': data.Subscribe},
+    return JsonResponse({'code': 0, 'data': data.count, 'enabled': data.subscribe, "test": data.test},
                         json_dumps_params={'ensure_ascii': False})
 
 
