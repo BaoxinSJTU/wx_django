@@ -77,13 +77,13 @@ def get_count():
     """
     获取当前计数
     """
-    try:
-        data = State.objects.get(id=1)
-    except State.DoesNotExist:
-        data = State()
-    data.id = 1
-    data.state = False
-    data.save()
+    # try:
+    #     data = State.objects.get(id=1)
+    # except State.DoesNotExist:
+    #     data = State()
+    # data.id = 1
+    # data.state = False
+    # data.save()
     try:
         data = Counters.objects.get(id=1)
     except Counters.DoesNotExist:
