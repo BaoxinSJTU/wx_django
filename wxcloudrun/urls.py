@@ -29,7 +29,7 @@ urlpatterns = (
     # 计数器接口
     url(r'^^api/count(/)?$', views.counter),
     # 喝水状态接口
-    url(r'^^api/remainer(/)?$', views.remainer),
+    url(r'^api/remainer(/)?$', views.remainer),
 
     # 获取主页
     url(r'(/)?$', views.index),

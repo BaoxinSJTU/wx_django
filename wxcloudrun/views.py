@@ -1,7 +1,6 @@
 import json
 import logging
 
-from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.shortcuts import render
 from wxcloudrun.models import Counters
@@ -9,7 +8,6 @@ from wxcloudrun.models import State
 
 logger = logging.getLogger('log')
 
-@require_http_methods(["GET", "POST"])
 def remainer(request):
     rsp = JsonResponse({'code': 0, 'errorMsg': ''}, json_dumps_params={'ensure_ascii': False})
     if request.method.lower() == 'get':
