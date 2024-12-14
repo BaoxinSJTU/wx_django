@@ -16,6 +16,7 @@ class Counters(models.Model):
     class Meta:
         db_table = 'Counters'  # 数据库表名
 
+
 class State(models.Model):
     id = models.AutoField
     state = models.BooleanField(default=False, verbose_name="状态")
