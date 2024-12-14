@@ -1,5 +1,12 @@
 {
-  "containers": [],
+  "containers": [
+    {
+      "name": "wx_django",
+      "containerId": "0605bfe855c704ea18e302d78754aa8ed7aa87ba0bbf0b2b8093196d3c5a36b0",
+      "domain": "",
+      "ip": ""
+    }
+  ],
   "config": {
     "wx_django": {
       "containerPort": 80,
@@ -20,9 +27,9 @@
         }
       ],
       "envParams": {
-        "MYSQL_USERNAME": "",
-        "MYSQL_PASSWORD": "",
-        "MYSQL_ADDRESS": ""
+        "MYSQL_USERNAME": "root",
+        "MYSQL_PASSWORD": "13544374193s6A@",
+        "MYSQL_ADDRESS": "10.9.102.221:3306"
       },
       "customLogs": "stdout",
       "initialDelaySeconds": 2,

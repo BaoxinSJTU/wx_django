@@ -4,20 +4,12 @@ import logging
 from django.http import JsonResponse
 from django.shortcuts import render
 from wxcloudrun.models import Counters
-from wxcloudrun.models import State
 
 logger = logging.getLogger('log')
 
 def remainer(request):
     rsp = JsonResponse({'code': 0, 'errorMsg': ''}, json_dumps_params={'ensure_ascii': False})
     if request.method.lower() == 'get':
-        try:
-            data = State.objects.get(id=1)
-        except State.DoesNotExist:
-            data = State()
-        data.id = 1
-        data.state = False
-        data.save()
         rsp = JsonResponse({'code' : 0, "data": True}, json_dumps_params={'ensure_ascii': False})
     elif request.method.lower() == 'post':
         try:
@@ -29,13 +21,6 @@ def remainer(request):
 
         if "enabled" in body:
             enabled = body["enabled"]
-            try:
-                data = State.objects.get(id=1)
-            except State.DoesNotExist:
-                data = State()
-            data.id = 1
-            data.state = enabled
-            data.save()
             rsp = JsonResponse({'code' : 0, "data": True}, json_dumps_params={'ensure_ascii': False})
         else:
             rsp = JsonResponse({'code' : 0, "data": False, 'errorMsg': '请求字段需要包含 enabled'}, json_dumps_params={'ensure_ascii': False})
@@ -77,19 +62,12 @@ def get_count():
     """
     获取当前计数
     """
-    # try:
-    #     data = State.objects.get(id=1)
-    # except State.DoesNotExist:
-    #     data = State()
-    # data.id = 1
-    # data.state = False
-    # data.save()
     try:
         data = Counters.objects.get(id=1)
     except Counters.DoesNotExist:
-        return JsonResponse({'code': 0, 'data': 0, 'enabled': True},
+        return JsonResponse({'code': 0, 'data': 0, 'Subscribe': "Object Not Exist!"},
                     json_dumps_params={'ensure_ascii': False})
-    return JsonResponse({'code': 0, 'data': data.count, 'enabled': True},
+    return JsonResponse({'code': 0, 'data': data.count, 'enabled': data.Subscribe},
                         json_dumps_params={'ensure_ascii': False})
 
 
