@@ -64,11 +64,6 @@ def send_wechat_template_message(openid, template_id, data, url=None, mini_progr
         "data": data
     }
 
-    if url:
-        payload["url"] = url
-    if mini_program:
-        payload["miniprogram"] = mini_program
-
     try:
         response = requests.post(send_url, json=payload)
         return response.json()
@@ -163,7 +158,7 @@ def wechat_user_view(request, _):
                 data=template_data,
                 url='https://django-b65k-131657-9-1333067814.sh.run.tcloudbase.com/',  # 可选，点击模板消息后跳转的链接
                 mini_program={
-                    "appid": "your_mini_program_appid",  # 替换为您的小程序AppID
+                    "appid": settings.WECHAT_APPID,  # 替换为您的小程序AppID
                     "pagepath": "path/to/page"  # 替换为小程序内的具体页面路径
                 }
             )
