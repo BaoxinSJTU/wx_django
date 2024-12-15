@@ -13,64 +13,69 @@ def wechat_user_view(request):
     if request.method == 'GET':
         try:
             target_openid = '18813421705'
-            
-            # 检查是否存在指定的 openid
-            user_exists = WeChatUser.objects.filter(openid=target_openid).exists()
-            
-            if not user_exists:
-                # 如果不存在，则创建该用户
-                new_user = WeChatUser.objects.create(
-                    openid=target_openid,
-                    is_subscribed=True  # 根据需求设置默认值
-                )
+
+            # 使用 get_or_create 简化检查和创建用户的逻辑
+            user, created = WeChatUser.objects.get_or_create(
+                openid=target_openid,
+                defaults={'is_subscribed': True}
+            )
+
+            if created:
                 logger.info(f"Created new WeChatUser with openid={target_openid}")
-            
-            # 获取所有 WeChatUser 实例，并选择需要的字段
-            users = WeChatUser.objects.values('openid', 'last_access_time', 'is_subscribed')
-            users_list = list(users)
-            
-            if not users_list:
+            else:
+                logger.info(f"WeChatUser with openid={target_openid} already exists.")
+
+            # 获取所有 WeChatUser 实例
+            users = WeChatUser.objects.all()
+
+            if not users.exists():
                 # 如果没有用户，返回提示信息
                 return JsonResponse(
                     {'message': 'No WeChatUser entries found.'},
                     status=200
                 )
-            
+
+            # 序列化所有用户的数据
+            users_list = [{
+                'openid': user.openid,
+                'last_access_time': user.last_access_time.isoformat(),  # 将 datetime 转换为字符串
+                'is_subscribed': user.is_subscribed
+            } for user in users]
+
             # 返回所有用户的数据
             return JsonResponse({'users': users_list}, status=200)
-        
+
         except Exception as e:
-            # 捕获异常，记录错误日志（可选）
-            print(f"Error during GET request: {str(e)}")
-            traceback.print_exc()
+            # 记录错误日志
+            logger.error(f"Error during GET request: {str(e)}", exc_info=True)
             # 返回错误信息作为网页响应
             return HttpResponse(
-                f"<h1>500 Internal Server Error</h1><p>{str(e)}</p>",
+                "<h1>500 Internal Server Error</h1><p>An error occurred while processing your request.</p>",
                 status=500
             )
-    
+
     elif request.method == 'POST':
         try:
             # 清空 WeChatUser 表中的所有数据
             WeChatUser.objects.all().delete()
+            logger.info("All WeChatUser entries have been deleted via POST request.")
             # 返回成功信息
             return HttpResponse(
                 "<h1>Success</h1><p>All WeChatUser entries have been deleted.</p>",
                 status=200
             )
-        
+
         except Exception as e:
-            # 捕获异常，记录错误日志（可选）
-            print(f"Error during POST request: {str(e)}")
-            traceback.print_exc()
+            # 记录错误日志
+            logger.error(f"Error during POST request: {str(e)}", exc_info=True)
             # 返回错误信息作为网页响应
             return HttpResponse(
-                f"<h1>500 Internal Server Error</h1><p>{str(e)}</p>",
+                "<h1>500 Internal Server Error</h1><p>An error occurred while processing your request.</p>",
                 status=500
             )
-    
+
     else:
-        # 不支持的 HTTP 方法
+        # 处理不支持的 HTTP 方法
         return HttpResponse(
             "<h1>405 Method Not Allowed</h1><p>Unsupported HTTP method.</p>",
             status=405
