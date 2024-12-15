@@ -12,19 +12,6 @@ logger = logging.getLogger('log')
 def wechat_user_view(request, _):
     if request.method == 'GET':
         try:
-            target_openid = '18813421705'
-
-            # 使用 get_or_create 简化检查和创建用户的逻辑
-            user, created = WeChatUser.objects.get_or_create(
-                openid=target_openid,
-                defaults={'is_subscribed': True}
-            )
-
-            if created:
-                logger.info(f"Created new WeChatUser with openid={target_openid}")
-            else:
-                logger.info(f"WeChatUser with openid={target_openid} already exists.")
-
             # 获取所有 WeChatUser 实例
             users = WeChatUser.objects.all()
 
