@@ -60,6 +60,8 @@ def wechat_user_view(request, _):
             WeChatUser.objects.all().delete()
             logger.info("All WeChatUser entries have been deleted via POST request.")
             # 返回成功信息
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
             return HttpResponse(
                 "<h1>Success</h1><p>All WeChatUser entries have been deleted.</p>",
                 status=200
