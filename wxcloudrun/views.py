@@ -6,9 +6,74 @@ from django.shortcuts import render
 from wxcloudrun.models import Counters, WeChatUser
 from django.views.decorators.csrf import csrf_exempt
 import traceback
+from django.core.cache import cache
+from django.conf import settings
+import requests
 
 logger = logging.getLogger('log')
+def get_wechat_access_token():
+    """
+    获取微信的Access Token，并缓存以减少请求次数。
+    """
+    access_token = cache.get('wechat_access_token')
+    if access_token:
+        return access_token
 
+    appid = settings.WECHAT_APPID
+    secret = settings.WECHAT_SECRET
+    url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={secret}"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if 'access_token' in data:
+            access_token = data['access_token']
+            expires_in = data.get('expires_in', 7200)  # 默认7200秒
+            cache.set('wechat_access_token', access_token, expires_in - 200)  # 提前200秒过期
+            return access_token
+        else:
+            logger.error(f"Failed to obtain access token: {data}")
+            return None
+    except Exception as e:
+        logger.error(f"Exception while obtaining access token: {str(e)}", exc_info=True)
+        return None
+def send_wechat_template_message(openid, template_id, data, url=None, mini_program=None):
+    """
+    发送微信模板消息。
+
+    参数:
+        openid (str): 接收者的openid。
+        template_id (str): 模板ID。
+        data (dict): 模板数据。
+        url (str, optional): 模板跳转链接。
+        mini_program (dict, optional): 小程序页面信息。
+
+    返回:
+        dict: 微信API的响应。
+    """
+    access_token = get_wechat_access_token()
+    if not access_token:
+        logger.error("Cannot send template message without access token.")
+        return None
+
+    send_url = f"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={access_token}"
+    payload = {
+        "touser": openid,
+        "template_id": template_id,
+        "data": data
+    }
+
+    if url:
+        payload["url"] = url
+    if mini_program:
+        payload["miniprogram"] = mini_program
+
+    try:
+        response = requests.post(send_url, json=payload)
+        return response.json()
+    except Exception as e:
+        logger.error(f"Exception while sending template message: {str(e)}", exc_info=True)
+        return None
 def wechat_user_view(request, _):
     if request.method == 'GET':
         try:
@@ -72,6 +137,44 @@ def wechat_user_view(request, _):
             user.is_subscribed = is_subscribed
             user.save()
 
+            template_id = "qrMCaZ15_RvZ2QqSbaGhn1JtO8LsL1fWxApJDUvGHmI"
+            template_data = {
+                "日期": {
+                    "value": "2019年10月15日",
+                    "color": "#173177"
+                },
+                "城市": {
+                    "value": "东莞市",
+                    "color": "#173177"
+                },
+                "天气": {
+                    "value": "晴",
+                    "color": "#173177"
+                },
+                "温度": {
+                    "value": "25~28°",
+                    "color": "#173177"
+                },
+                "温馨提示": {
+                    "value": "温度较低，请注意保暖哦",
+                    "color": "#173177"
+                }
+            }
+            send_result = send_wechat_template_message(
+                openid=openid,
+                template_id=template_id,
+                data=template_data,
+                url='https://django-b65k-131657-9-1333067814.sh.run.tcloudbase.com/',  # 可选，点击模板消息后跳转的链接
+                mini_program={
+                    "appid": "your_mini_program_appid",  # 替换为您的小程序AppID
+                    "pagepath": "path/to/page"  # 替换为小程序内的具体页面路径
+                }
+            )
+
+            if send_result and send_result.get('errcode') == 0:
+                logger.info(f"Template message sent successfully to {openid}.")
+            else:
+                logger.error(f"Failed to send template message: {send_result}")
             # 根据是否创建了新用户，返回不同的提示信息
             if created:
                 return JsonResponse(
@@ -83,6 +186,7 @@ def wechat_user_view(request, _):
                     {'message': 'User subscribed status updated.'},
                     status=200
                 )
+            
 
         except Exception as e:
             # 记录错误日志
