@@ -139,26 +139,22 @@ def wechat_user_view(request, _):
             user.save()
 
             template_id = "qrMCaZ15_RvZ2QqSbaGhn1JtO8LsL1fWxApJDUvGHmI"
+            
             template_data = {
-                "日期": {
-                    "value": "2019年10月15日",
-                    "color": "#173177"
+                "date1": {
+                    "value": "2019年10月15日"
                 },
-                "城市": {
-                    "value": "东莞市",
-                    "color": "#173177"
+                "phrase2": {
+                    "value": "东莞市"
                 },
-                "天气": {
-                    "value": "晴",
-                    "color": "#173177"
+                "phrase3": {
+                    "value": "晴"
                 },
-                "温度": {
-                    "value": "25~28°",
-                    "color": "#173177"
+                "character_string4": {
+                    "value": "25~28°"
                 },
-                "温馨提示": {
-                    "value": "温度较低，请注意保暖哦",
-                    "color": "#173177"
+                "thing5": {
+                    "value": "温度较低，请注意保暖哦"
                 }
             }
             send_result = send_wechat_template_message(
