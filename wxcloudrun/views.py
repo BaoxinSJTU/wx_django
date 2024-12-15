@@ -66,6 +66,7 @@ def send_wechat_template_message(openid, template_id, data, url=None, mini_progr
 
     try:
         response = requests.post(send_url, json=payload)
+
         return response.json()
     except Exception as e:
         logger.error(f"Exception while sending template message: {str(e)}", exc_info=True)
@@ -108,9 +109,10 @@ def wechat_user_view(request, _):
             body_unicode = request.body.decode('utf-8')
             # 将JSON字符串解析为Python字典
             body = json.loads(body_unicode)
-
+            logger.info(body)
             # 检查是否存在'openid'字段
             if 'openid' not in body:
+                logger.error('Missing "openid" field.')
                 return JsonResponse(
                     {'error': 'Missing "openid" field.'},
                     status=400
@@ -118,6 +120,7 @@ def wechat_user_view(request, _):
 
             # 检查是否存在'is_subscribed'字段
             if 'is_subscribed' not in body:
+                logger.error('Missing "is_subscribed" field.')
                 return JsonResponse(
                     {'error': 'Missing "is_subscribed" field.'},
                     status=400
