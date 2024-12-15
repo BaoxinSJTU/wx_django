@@ -43,30 +43,46 @@ def wechat_user_view(request, _):
 
     elif request.method == 'POST':
         try:
-        #     body_unicode = request.body.decode('utf-8')
-        #     body = json.loads(body_unicode)
-        #     if 'openid' in body:
-        #         target_openid = body["openid"]
-        #         # 使用 get_or_create 简化检查和创建用户的逻辑
-        #         user, created = WeChatUser.objects.get_or_create(
-        #             openid = body["openid"],
-        #             is_subscribed = body["is_subscribed"]
-        #         )
+            # 解码请求体为UTF-8字符串
+            body_unicode = request.body.decode('utf-8')
+            # 将JSON字符串解析为Python字典
+            body = json.loads(body_unicode)
 
-        #         if created:
-        #             logger.info(f"Created new WeChatUser with openid={target_openid}")
-        #         else:
-        #             logger.info(f"WeChatUser with openid={target_openid} already exists.")
-        #         return HttpResponse(
-        #             f"<h1>Success</h1><p>openid: {body["openid"]} added to database</p>",
-        #             status=200
-        #         )
-        #     else:
-        #         logger.error("Post does not provides openid string.")
-            return HttpResponse(
-                f"<h1>Success</h1><p>Post does not provides openid string.</p>",
-                status=200
-            )
+            # 检查是否存在'openid'字段
+            if 'openid' not in body:
+                return JsonResponse(
+                    {'error': 'Missing "openid" field.'},
+                    status=400
+                )
+
+            # 检查是否存在'is_subscribed'字段
+            if 'is_subscribed' not in body:
+                return JsonResponse(
+                    {'error': 'Missing "is_subscribed" field.'},
+                    status=400
+                )
+
+            # 获取'openid'和'is_subscribed'的值
+            openid = body['openid']
+            is_subscribed = body['is_subscribed']
+
+            # 使用get_or_create方法获取或创建WeChatUser实例
+            user, created = WeChatUser.objects.get_or_create(openid=openid)
+            # 更新is_subscribed字段
+            user.is_subscribed = is_subscribed
+            user.save()
+
+            # 根据是否创建了新用户，返回不同的提示信息
+            if created:
+                return JsonResponse(
+                    {'message': 'User created and subscribed status updated.'},
+                    status=201
+                )
+            else:
+                return JsonResponse(
+                    {'message': 'User subscribed status updated.'},
+                    status=200
+                )
 
         except Exception as e:
             # 记录错误日志
