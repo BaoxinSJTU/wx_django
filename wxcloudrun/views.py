@@ -9,7 +9,7 @@ import traceback
 
 logger = logging.getLogger('log')
 
-def wechat_user_view(request):
+def wechat_user_view(request, _):
     if request.method == 'GET':
         try:
             target_openid = '18813421705'
