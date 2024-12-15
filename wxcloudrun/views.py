@@ -56,16 +56,30 @@ def wechat_user_view(request, _):
 
     elif request.method == 'POST':
         try:
-            # 清空 WeChatUser 表中的所有数据
-            WeChatUser.objects.all().delete()
-            logger.info("All WeChatUser entries have been deleted via POST request.")
-            # 返回成功信息
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
-            return HttpResponse(
-                "<h1>Success</h1><p>All WeChatUser entries have been deleted.</p>",
-                status=200
-            )
+            if 'openid' in body:
+                target_openid = body["openid"]
+                # 使用 get_or_create 简化检查和创建用户的逻辑
+                user, created = WeChatUser.objects.get_or_create(
+                    openid = body["openid"],
+                    is_subscribed = body["is_subscribed"]
+                )
+
+                if created:
+                    logger.info(f"Created new WeChatUser with openid={target_openid}")
+                else:
+                    logger.info(f"WeChatUser with openid={target_openid} already exists.")
+                return HttpResponse(
+                    f"<h1>Success</h1><p>openid: {body["openid"]} added to database</p>",
+                    status=200
+                )
+            else:
+                logger.error("Post does not provides openid string.")
+                return HttpResponse(
+                    f"<h1>Success</h1><p>Post does not provides openid string.</p>",
+                    status=200
+                )
 
         except Exception as e:
             # 记录错误日志
