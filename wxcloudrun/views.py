@@ -30,6 +30,7 @@ def get_wechat_access_token():
             access_token = data['access_token']
             expires_in = data.get('expires_in', 7200)  # 默认7200秒
             cache.set('wechat_access_token', access_token, expires_in - 200)  # 提前200秒过期
+            logger.info(f"get access_token: {access_token}")
             return access_token
         else:
             logger.error(f"Failed to obtain access token: {data}")
